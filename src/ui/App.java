@@ -1,7 +1,8 @@
+package ui;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import ui.MainView;
 
 public class App extends Application {
 
@@ -11,6 +12,7 @@ public class App extends Application {
 
         Scene scene = new Scene(root, 800, 600);
         scene.getStylesheets().add(getClass().getResource("/ui/styles.css").toExternalForm());
+
         stage.setTitle("Help Desk System");
         stage.setScene(scene);
         stage.show();

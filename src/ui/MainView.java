@@ -4,11 +4,29 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import model.User;
 
 public class MainView extends VBox {
 
     public MainView() {
-        showHome();
+        this.setAlignment(Pos.CENTER);
+        this.setSpacing(20);
+        showLogin();
+    }
+
+    private void showLogin() {
+        this.getChildren().clear();
+
+        LoginView loginView = new LoginView(user -> {
+            // after successful login, show corresponding dashboard
+            if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+                showAdminDashboard();
+            } else {
+                showHome();
+            }
+        });
+
+        this.getChildren().setAll(loginView);
     }
 
     private void showHome() {
@@ -20,16 +38,16 @@ public class MainView extends VBox {
         title.getStyleClass().add("title");
 
         Button submitBtn = new Button("Submit Ticket");
-        Button adminBtn = new Button("Admin Dashboard");
+        Button logoutBtn = new Button("Logout");
 
-        submitBtn.setOnAction(e -> {
-            this.getChildren().setAll(new SubmitTicketView(this::showHome));
-        });
+        submitBtn.setOnAction(e -> this.getChildren().setAll(new SubmitTicketView(this::showHome)));
+        logoutBtn.setOnAction(e -> showLogin());
 
-        adminBtn.setOnAction(e -> {
-            this.getChildren().setAll(new AdminDashboardView(this::showHome));
-        });
+        this.getChildren().addAll(title, submitBtn, logoutBtn);
+    }
 
-        this.getChildren().addAll(title, submitBtn, adminBtn);
+    private void showAdminDashboard() {
+        this.getChildren().clear();
+        this.getChildren().add(new AdminDashboardView(this::showLogin));
     }
 }
