@@ -22,7 +22,7 @@ public class LoginView extends VBox {
         usernameField.setFocusTraversable(false);
         usernameField.setMaxWidth(300);
 
-        TextField passwordField = new TextField();
+        PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
         passwordField.setFocusTraversable(false);
         passwordField.setMaxWidth(300);

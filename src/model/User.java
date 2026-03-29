@@ -11,5 +11,12 @@ public class User {
         this.role = role;
     }
 
+    public int getUserID() {
+        return userID;
+    }
+
+    public String getUsername() {
+        return username;
+    }
     public String getRole() { return role; }
 }
