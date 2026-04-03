@@ -6,9 +6,11 @@ import javafx.scene.layout.VBox;
 import model.Ticket;
 import service.TicketService;
 
+import java.util.function.Consumer;
+
 public class AdminDashboardView extends VBox {
 
-    public AdminDashboardView(Runnable goBack) {
+    public AdminDashboardView(Runnable goBack, Consumer<Ticket> openDetail) {
         this.setAlignment(Pos.CENTER);
         this.setSpacing(20);
 
@@ -56,6 +58,17 @@ public class AdminDashboardView extends VBox {
 
         TicketService service = new TicketService();
         table.getItems().addAll(service.getAllTickets());
+
+        table.setRowFactory(tv -> {
+            TableRow<Ticket> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 1 && (!row.isEmpty())) {
+                    Ticket ticket = row.getItem();
+                    openDetail.accept(ticket);
+                }
+            });
+            return row;
+        });
 
         Button backBtn = new Button("← Back");
         backBtn.setOnAction(e -> goBack.run());

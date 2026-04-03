@@ -4,7 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import model.User;
+import model.Ticket;
 
 public class MainView extends VBox {
 
@@ -48,6 +48,11 @@ public class MainView extends VBox {
 
     private void showAdminDashboard() {
         this.getChildren().clear();
-        this.getChildren().add(new AdminDashboardView(this::showLogin));
+        this.getChildren().add(new AdminDashboardView(this::showLogin, ticket -> showTicketDetail(ticket)));
+    }
+
+    private void showTicketDetail(Ticket ticket) {
+        this.getChildren().clear();
+        this.getChildren().add(new TicketDetailView(ticket, this::showAdminDashboard));
     }
 }

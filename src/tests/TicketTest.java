@@ -8,7 +8,7 @@ public class TicketTest {
 
     @Test
     public void testConstructorAndGetters() {
-        Ticket ticket = new Ticket("Login Issue", "Cannot log in");
+        Ticket ticket = new Ticket(1, "Login Issue", "Cannot log in");
 
         assertEquals("Login Issue", ticket.getTitle());
         assertEquals("Cannot log in", ticket.getDescription());
@@ -17,7 +17,7 @@ public class TicketTest {
 
     @Test
     public void testSetAndGetCategory() {
-        Ticket ticket = new Ticket("Issue", "Desc");
+        Ticket ticket = new Ticket(2, "Issue", "Desc");
         ticket.setCategory("Network");
 
         assertEquals("Network", ticket.getCategory());
@@ -25,7 +25,7 @@ public class TicketTest {
 
     @Test
     public void testSetAndGetPriority() {
-        Ticket ticket = new Ticket("Issue", "Desc");
+        Ticket ticket = new Ticket(3, "Issue", "Desc");
         ticket.setPriority("High");
 
         assertEquals("High", ticket.getPriority());
@@ -33,7 +33,7 @@ public class TicketTest {
 
     @Test
     public void testDefaultValues() {
-        Ticket ticket = new Ticket("Issue", "Desc");
+        Ticket ticket = new Ticket(4, "Issue", "Desc");
 
         assertNull(ticket.getCategory());
         assertNull(ticket.getPriority());
