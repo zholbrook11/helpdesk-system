@@ -4,13 +4,17 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import storage.TicketDAO;
+import java.util.function.Consumer;
 
 public class AdminDashboardView extends VBox {
 
     private final TicketDAO ticketDAO = new TicketDAO();
     private final TableView<TicketDAO.TicketWithUser> table = new TableView<>();
+    @SuppressWarnings("unused")
+    private final Consumer<Integer> onTicketSelected;
 
-    public AdminDashboardView(Runnable goBack) {
+    public AdminDashboardView(Runnable goBack, Consumer<Integer> onTicketSelected) {
+        this.onTicketSelected = onTicketSelected;
         this.setAlignment(Pos.CENTER);
         this.setSpacing(20);
 
@@ -21,7 +25,7 @@ public class AdminDashboardView extends VBox {
         searchField.setPromptText("Search tickets...");
         searchField.setMaxWidth(400);
 
-// Columns
+        // Columns
         TableColumn<TicketDAO.TicketWithUser, String> userCol = new TableColumn<>("User");
         userCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(data.getValue().getUsername()));
@@ -34,7 +38,9 @@ public class AdminDashboardView extends VBox {
         descCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(data.getValue().getTicket().getDescription()));
         descCol.setPrefWidth(250);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        @SuppressWarnings("deprecation")
+        var constrained = TableView.CONSTRAINED_RESIZE_POLICY;
+        table.setColumnResizePolicy(constrained);
 
         descCol.setCellFactory(tc -> {
             TableCell<TicketDAO.TicketWithUser, String> cell = new TableCell<>();
@@ -54,7 +60,28 @@ public class AdminDashboardView extends VBox {
         priCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(data.getValue().getTicket().getPriority()));
 
-        table.getColumns().addAll(userCol, titleCol, catCol, priCol, descCol);
+        table.getColumns().add(userCol);
+        table.getColumns().add(titleCol);
+        table.getColumns().add(catCol);
+        table.getColumns().add(priCol);
+        table.getColumns().add(descCol);
+
+        // Add row click handler
+        table.setRowFactory(tv -> {
+            TableRow<TicketDAO.TicketWithUser> row = new TableRow<TicketDAO.TicketWithUser>() {
+                @Override
+                protected void updateItem(TicketDAO.TicketWithUser item, boolean empty) {
+                    super.updateItem(item, empty);
+                }
+            };
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getClickCount() == 1) {
+                    TicketDAO.TicketWithUser selectedTicket = row.getItem();
+                    onTicketSelected.accept(selectedTicket.getTicket().getTicketID());
+                }
+            });
+            return row;
+        });
 
         // Initial load
         refreshTable("");

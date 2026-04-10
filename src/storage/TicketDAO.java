@@ -40,7 +40,7 @@ public class TicketDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Ticket ticket = new Ticket(rs.getString("title"), rs.getString("description"));
+                Ticket ticket = new Ticket(rs.getInt("ticketID"), rs.getString("title"), rs.getString("description"));
                 ticket.setCategory(rs.getString("category"));
                 ticket.setPriority(rs.getString("priority"));
                 tickets.add(new TicketWithUser(ticket, rs.getString("username")));
@@ -68,7 +68,7 @@ public class TicketDAO {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Ticket ticket = new Ticket(rs.getString("title"), rs.getString("description"));
+                Ticket ticket = new Ticket(rs.getInt("ticketID"), rs.getString("title"), rs.getString("description"));
                 ticket.setCategory(rs.getString("category"));
                 ticket.setPriority(rs.getString("priority"));
                 tickets.add(new TicketWithUser(ticket, rs.getString("username")));
@@ -79,6 +79,44 @@ public class TicketDAO {
             throw new RuntimeException(e);
         }
         return tickets;
+    }
+
+    public Ticket getTicketById(int ticketID) {
+        String sql = "SELECT t.ticketID, t.title, t.description, t.category, t.priority, t.timestamp " +
+                "FROM Tickets t WHERE t.ticketID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ticketID);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Ticket ticket = new Ticket(rs.getInt("ticketID"), rs.getString("title"), rs.getString("description"));
+                ticket.setCategory(rs.getString("category"));
+                ticket.setPriority(rs.getString("priority"));
+                return ticket;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public void updateTicket(Ticket ticket) throws Exception {
+        String sql = "UPDATE Tickets SET category = ?, priority = ? WHERE ticketID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, ticket.getCategory());
+            stmt.setString(2, ticket.getPriority());
+            stmt.setInt(3, ticket.getTicketID());
+
+            stmt.executeUpdate();
+        }
     }
 
     public static class TicketWithUser {

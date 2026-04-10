@@ -52,6 +52,14 @@ public class MainView extends VBox {
 
     private void showAdminDashboard() {
         this.getChildren().clear();
-        this.getChildren().add(new AdminDashboardView(this::showLogin));
+        this.getChildren().add(new AdminDashboardView(
+            this::showLogin,
+            ticketID -> showTicketDetail(ticketID)
+        ));
+    }
+
+    private void showTicketDetail(int ticketID) {
+        this.getChildren().clear();
+        this.getChildren().add(new TicketDetailView(ticketID, loggedInUser.getUserID(), this::showAdminDashboard));
     }
 }
