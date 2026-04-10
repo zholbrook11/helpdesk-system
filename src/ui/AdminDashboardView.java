@@ -3,10 +3,12 @@ package ui;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import model.Ticket;
-import service.TicketService;
+import storage.TicketDAO;
 
 public class AdminDashboardView extends VBox {
+
+    private final TicketDAO ticketDAO = new TicketDAO();
+    private final TableView<TicketDAO.TicketWithUser> table = new TableView<>();
 
     public AdminDashboardView(Runnable goBack) {
         this.setAlignment(Pos.CENTER);
@@ -15,51 +17,63 @@ public class AdminDashboardView extends VBox {
         Label title = new Label("Admin Dashboard");
         title.getStyleClass().add("title");
 
-        TableView<Ticket> table = new TableView<>();
-        table.setMaxWidth(500);
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search tickets...");
+        searchField.setMaxWidth(400);
 
-        TableColumn<Ticket, String> titleCol = new TableColumn<>("Title");
+// Columns
+        TableColumn<TicketDAO.TicketWithUser, String> userCol = new TableColumn<>("User");
+        userCol.setCellValueFactory(data ->
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getUsername()));
+
+        TableColumn<TicketDAO.TicketWithUser, String> titleCol = new TableColumn<>("Title");
         titleCol.setCellValueFactory(data ->
-            new javafx.beans.property.SimpleStringProperty(data.getValue().getTitle()));
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getTicket().getTitle()));
 
-        TableColumn<Ticket, String> descCol = new TableColumn<>("Description");
+        TableColumn<TicketDAO.TicketWithUser, String> descCol = new TableColumn<>("Description");
         descCol.setCellValueFactory(data ->
-            new javafx.beans.property.SimpleStringProperty(data.getValue().getDescription()));
-
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getTicket().getDescription()));
         descCol.setPrefWidth(250);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         descCol.setCellFactory(tc -> {
-            TableCell<Ticket, String> cell = new TableCell<>();
+            TableCell<TicketDAO.TicketWithUser, String> cell = new TableCell<>();
             Label label = new Label();
             label.setWrapText(true);
             label.setMaxWidth(250);
-
             cell.setGraphic(label);
-
-            cell.itemProperty().addListener((obs, oldText, newText) -> {
-                label.setText(newText);
-            });
-
+            cell.itemProperty().addListener((obs, oldText, newText) -> label.setText(newText));
             return cell;
         });
 
-        TableColumn<Ticket, String> catCol = new TableColumn<>("Category");
+        TableColumn<TicketDAO.TicketWithUser, String> catCol = new TableColumn<>("Category");
         catCol.setCellValueFactory(data ->
-            new javafx.beans.property.SimpleStringProperty(data.getValue().getCategory()));
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getTicket().getCategory()));
 
-        TableColumn<Ticket, String> priCol = new TableColumn<>("Priority");
+        TableColumn<TicketDAO.TicketWithUser, String> priCol = new TableColumn<>("Priority");
         priCol.setCellValueFactory(data ->
-            new javafx.beans.property.SimpleStringProperty(data.getValue().getPriority()));
+                new javafx.beans.property.SimpleStringProperty(data.getValue().getTicket().getPriority()));
 
-        table.getColumns().addAll(titleCol, catCol, priCol, descCol);
+        table.getColumns().addAll(userCol, titleCol, catCol, priCol, descCol);
 
-        TicketService service = new TicketService();
-        table.getItems().addAll(service.getAllTickets());
+        // Initial load
+        refreshTable("");
+
+        // Search dynamically
+        searchField.textProperty().addListener((obs, oldText, newText) -> refreshTable(newText));
 
         Button backBtn = new Button("← Back");
         backBtn.setOnAction(e -> goBack.run());
 
-        this.getChildren().addAll(title, table, backBtn);
+        this.getChildren().addAll(title, searchField, table, backBtn);
+    }
+
+    private void refreshTable(String keyword) {
+        table.getItems().clear();
+        if (keyword.isEmpty()) {
+            table.getItems().addAll(ticketDAO.getAllTickets());
+        } else {
+            table.getItems().addAll(ticketDAO.searchTickets(keyword));
+        }
     }
 }

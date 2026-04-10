@@ -3,6 +3,7 @@ package ui;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import storage.TicketDAO;
 
 public class App extends Application {
 

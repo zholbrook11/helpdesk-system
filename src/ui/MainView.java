@@ -6,7 +6,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import model.User;
 
+
 public class MainView extends VBox {
+
+    private User loggedInUser;
 
     public MainView() {
         this.setAlignment(Pos.CENTER);
@@ -18,6 +21,7 @@ public class MainView extends VBox {
         this.getChildren().clear();
 
         LoginView loginView = new LoginView(user -> {
+            this.loggedInUser = user;
             // after successful login, show corresponding dashboard
             if ("ADMIN".equalsIgnoreCase(user.getRole())) {
                 showAdminDashboard();
@@ -40,7 +44,7 @@ public class MainView extends VBox {
         Button submitBtn = new Button("Submit Ticket");
         Button logoutBtn = new Button("Logout");
 
-        submitBtn.setOnAction(e -> this.getChildren().setAll(new SubmitTicketView(this::showHome)));
+        submitBtn.setOnAction(e -> this.getChildren().setAll(new SubmitTicketView(this::showHome, loggedInUser)));
         logoutBtn.setOnAction(e -> showLogin());
 
         this.getChildren().addAll(title, submitBtn, logoutBtn);
