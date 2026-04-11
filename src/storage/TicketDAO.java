@@ -106,14 +106,15 @@ public class TicketDAO {
     }
 
     public void updateTicket(Ticket ticket) throws Exception {
-        String sql = "UPDATE Tickets SET category = ?, priority = ? WHERE ticketID = ?";
+        String sql = "UPDATE Tickets SET category = ?, priority = ?, status = ? WHERE ticketID = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, ticket.getCategory());
             stmt.setString(2, ticket.getPriority());
-            stmt.setInt(3, ticket.getTicketID());
+            stmt.setString(3, ticket.getStatus());
+            stmt.setInt(4, ticket.getTicketID());
 
             stmt.executeUpdate();
         }
