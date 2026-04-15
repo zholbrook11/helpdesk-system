@@ -13,6 +13,7 @@ public class LoginView extends VBox {
     public LoginView(Consumer<User> onLoginSuccess) {
         this.setAlignment(Pos.CENTER);
         this.setSpacing(20);
+        this.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         Label title = new Label("Help Desk Login");
         title.getStyleClass().add("title");
