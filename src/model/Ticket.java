@@ -9,6 +9,7 @@ public class Ticket {
     private String category;
     private String priority;
     private String status;
+    private String assigned_team;
     private LocalDateTime timestamp;
 
     public Ticket(String title, String description) {
@@ -32,10 +33,12 @@ public class Ticket {
     public String getCategory() { return category; }
     public String getPriority() { return priority; }
     public String getStatus() { return status; }
+    public String getAssignedTeam() { return assigned_team; }
     public LocalDateTime getTimestamp() { return timestamp; }
 
     public void setTicketID(int ticketID) { this.ticketID = ticketID; }
     public void setCategory(String category) { this.category = category; }
     public void setPriority(String priority) { this.priority = priority; }
     public void setStatus(String status) { this.status = status; }
+    public void setAssignedTeam(String assignedTeam) { this.assigned_team = assignedTeam; }
 }

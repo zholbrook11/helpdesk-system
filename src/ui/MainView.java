@@ -42,12 +42,14 @@ public class MainView extends VBox {
         title.getStyleClass().add("title");
 
         Button submitBtn = new Button("Submit Ticket");
+        Button statusBtn = new Button("View current status of my tickets");
         Button logoutBtn = new Button("Logout");
 
         submitBtn.setOnAction(e -> this.getChildren().setAll(new SubmitTicketView(this::showHome, loggedInUser)));
+        statusBtn.setOnAction(e -> this.getChildren().setAll(new TicketStatusView(this::showHome, loggedInUser)));
         logoutBtn.setOnAction(e -> showLogin());
 
-        this.getChildren().addAll(title, submitBtn, logoutBtn);
+        this.getChildren().addAll(title, submitBtn, statusBtn, logoutBtn);
     }
 
     private void showAdminDashboard() {

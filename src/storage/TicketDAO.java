@@ -10,8 +10,8 @@ import java.util.List;
 public class TicketDAO {
 
     public void addTicket(Ticket ticket, int userID) {
-        String sql = "INSERT INTO Tickets (title, description, category, priority, timestamp, userID) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Tickets (title, description, category, priority, timestamp, userID, assigned_team) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -21,6 +21,7 @@ public class TicketDAO {
             stmt.setString(4, ticket.getPriority());
             stmt.setTimestamp(5, Timestamp.valueOf(ticket.getTimestamp()));
             stmt.setInt(6, userID);
+            stmt.setString(7, ticket.getAssignedTeam());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -82,7 +83,7 @@ public class TicketDAO {
     }
 
     public Ticket getTicketById(int ticketID) {
-        String sql = "SELECT t.ticketID, t.title, t.description, t.category, t.priority, t.timestamp " +
+        String sql = "SELECT t.ticketID, t.title, t.description, t.category, t.priority, t.timestamp, t.assigned_team " +
                 "FROM Tickets t WHERE t.ticketID = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -95,6 +96,7 @@ public class TicketDAO {
                 Ticket ticket = new Ticket(rs.getInt("ticketID"), rs.getString("title"), rs.getString("description"));
                 ticket.setCategory(rs.getString("category"));
                 ticket.setPriority(rs.getString("priority"));
+                ticket.setAssignedTeam(rs.getString("assigned_team"));
                 return ticket;
             }
         } catch (SQLException e) {
@@ -106,7 +108,7 @@ public class TicketDAO {
     }
 
     public void updateTicket(Ticket ticket) throws Exception {
-        String sql = "UPDATE Tickets SET category = ?, priority = ?, status = ? WHERE ticketID = ?";
+        String sql = "UPDATE Tickets SET category = ?, priority = ?, status = ?, assigned_team = ? WHERE ticketID = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -114,7 +116,8 @@ public class TicketDAO {
             stmt.setString(1, ticket.getCategory());
             stmt.setString(2, ticket.getPriority());
             stmt.setString(3, ticket.getStatus());
-            stmt.setInt(4, ticket.getTicketID());
+            stmt.setString(4, ticket.getAssignedTeam());
+            stmt.setInt(5, ticket.getTicketID());
 
             stmt.executeUpdate();
         }
@@ -198,5 +201,39 @@ public class TicketDAO {
 
         public Ticket getTicket() { return ticket; }
         public String getUsername() { return username; }
+    }
+
+    public List<Ticket> getTicketsByUser(int userID) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        String sql = "SELECT ticketID, title, description, category, priority, status, assigned_team, timestamp " +
+                "FROM Tickets WHERE userID = ? ORDER BY timestamp DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userID);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Ticket ticket = new Ticket(
+                        rs.getInt("ticketID"),
+                        rs.getString("title"),
+                        rs.getString("description")
+                );
+
+                ticket.setCategory(rs.getString("category"));
+                ticket.setPriority(rs.getString("priority"));
+                ticket.setStatus(rs.getString("status"));
+                ticket.setAssignedTeam(rs.getString("assigned_team"));
+
+                tickets.add(ticket);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return tickets;
     }
 }

@@ -128,13 +128,27 @@ public class TicketDetailView extends VBox {
         VBox priVBox = new VBox(priorityLabel, priorityBox);
         VBox statVBox = new VBox(statusLabel, statusBox);
 
+        Label teamLabel = new Label("Assigned Team:");
+        ComboBox<String> teamBox = new ComboBox<>();
+        teamBox.getItems().addAll(
+                "Network Team",
+                "Security Team",
+                "Software Team",
+                "Infrastructure Team",
+                "General Support"
+        );
+        teamBox.setValue(ticket.getAssignedTeam() != null ? ticket.getAssignedTeam() : "General Support");
+
+        VBox teamVBox = new VBox(teamLabel, teamBox);
+        editableFields.getChildren().add(teamVBox);  // adds it next to other dropdowns
+
         editableFields.getChildren().addAll(catVBox, priVBox, statVBox);
         infoBox.getChildren().add(editableFields);
 
         section.getChildren().addAll(sectionTitle, infoBox);
 
         // Store references for later use
-        section.setUserData(new Object[]{categoryBox, priorityBox, statusBox});
+        section.setUserData(new Object[]{categoryBox, priorityBox, statusBox, teamBox});
 
         return section;
     }
@@ -250,10 +264,13 @@ public class TicketDetailView extends VBox {
         ComboBox<String> priorityBox = (ComboBox<String>) comboBoxes[1];
         @SuppressWarnings("unchecked")
         ComboBox<String> statusBox = (ComboBox<String>) comboBoxes[2];
+        @SuppressWarnings("unchecked")
+        ComboBox<String> teamBox = (ComboBox<String>) comboBoxes[3];
 
         ticket.setCategory(categoryBox.getValue());
         ticket.setPriority(priorityBox.getValue());
         ticket.setStatus(statusBox.getValue());
+        ticket.setAssignedTeam(teamBox.getValue());
 
         try {
             // If status is set to CLOSED, delete the ticket from the database
