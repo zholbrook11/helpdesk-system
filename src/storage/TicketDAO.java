@@ -120,6 +120,73 @@ public class TicketDAO {
         }
     }
 
+    public void deleteTicket(int ticketID) throws Exception {
+        String sql = "DELETE FROM Tickets WHERE ticketID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ticketID);
+            stmt.executeUpdate();
+        }
+    }
+
+    public int getTotalTicketCount() {
+        String sql = "SELECT COUNT(*) as count FROM Tickets";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
+    public java.util.Map<String, Integer> getTicketsByPriority() {
+        java.util.Map<String, Integer> priorityMap = new java.util.LinkedHashMap<>();
+        String sql = "SELECT priority, COUNT(*) as count FROM Tickets GROUP BY priority ORDER BY count DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                priorityMap.put(rs.getString("priority"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return priorityMap;
+    }
+
+    public java.util.Map<String, Integer> getTicketsByCategory() {
+        java.util.Map<String, Integer> categoryMap = new java.util.LinkedHashMap<>();
+        String sql = "SELECT category, COUNT(*) as count FROM Tickets GROUP BY category ORDER BY count DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                categoryMap.put(rs.getString("category"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return categoryMap;
+    }
+
     public static class TicketWithUser {
         private final Ticket ticket;
         private final String username;

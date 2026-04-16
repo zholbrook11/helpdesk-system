@@ -256,8 +256,14 @@ public class TicketDetailView extends VBox {
         ticket.setStatus(statusBox.getValue());
 
         try {
-            ticketDAO.updateTicket(ticket);
-            showAlert("Ticket updated successfully!");
+            // If status is set to CLOSED, delete the ticket from the database
+            if ("CLOSED".equals(ticket.getStatus())) {
+                ticketDAO.deleteTicket(ticket.getTicketID());
+                showAlert("Ticket closed and deleted successfully!");
+            } else {
+                ticketDAO.updateTicket(ticket);
+                showAlert("Ticket updated successfully!");
+            }
             onBack.run();
         } catch (Exception e) {
             e.printStackTrace();

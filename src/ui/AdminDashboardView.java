@@ -2,6 +2,7 @@ package ui;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import storage.TicketDAO;
 import java.util.function.Consumer;
@@ -13,10 +14,11 @@ public class AdminDashboardView extends VBox {
     @SuppressWarnings("unused")
     private final Consumer<Integer> onTicketSelected;
 
-    public AdminDashboardView(Runnable goBack, Consumer<Integer> onTicketSelected) {
+    public AdminDashboardView(Runnable goBack, Consumer<Integer> onTicketSelected, Runnable onAnalytics) {
         this.onTicketSelected = onTicketSelected;
-        this.setAlignment(Pos.CENTER);
+        this.setAlignment(Pos.TOP_CENTER);
         this.setSpacing(20);
+        this.setPadding(new javafx.geometry.Insets(20));
 
         Label title = new Label("Admin Dashboard");
         title.getStyleClass().add("title");
@@ -89,10 +91,21 @@ public class AdminDashboardView extends VBox {
         // Search dynamically
         searchField.textProperty().addListener((obs, oldText, newText) -> refreshTable(newText));
 
-        Button backBtn = new Button("← Back");
+        HBox buttonBox = new HBox();
+        buttonBox.setSpacing(10);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        Button analyticsBtn = new Button("📊 View Analytics");
+        analyticsBtn.setStyle("-fx-padding: 8 20;");
+        analyticsBtn.setOnAction(e -> onAnalytics.run());
+
+        Button backBtn = new Button("Logout");
+        backBtn.setStyle("-fx-padding: 8 20;");
         backBtn.setOnAction(e -> goBack.run());
 
-        this.getChildren().addAll(title, searchField, table, backBtn);
+        buttonBox.getChildren().addAll(analyticsBtn, backBtn);
+
+        this.getChildren().addAll(title, searchField, table, buttonBox);
     }
 
     private void refreshTable(String keyword) {
